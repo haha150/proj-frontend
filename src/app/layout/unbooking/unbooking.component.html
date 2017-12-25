@@ -1,0 +1,13 @@
+<div [@routerTransition]>
+    <app-page-header [heading]="'Unbooking page'" [icon]="'fa-table'"></app-page-header>
+    <div class="row">
+        <div class="col">
+            <div class="alert alert-success" *ngIf="unbooked && message !== null">
+		        <strong>{{message}}</strong>, Redirecting in 5 seconds.
+			</div>
+			<div class="alert alert-danger" *ngIf="!unbooked && message !== null">
+		        <strong>{{message}}</strong>, Redirecting in 5 seconds.
+			</div>
+        </div>
+    </div>
+</div>

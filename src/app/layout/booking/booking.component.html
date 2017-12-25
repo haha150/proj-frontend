@@ -1,0 +1,154 @@
+<div [@routerTransition]>
+    <app-page-header [heading]="'Booking page'" [icon]="'fa-table'"></app-page-header>
+    <div class="row">
+        <div class="col">
+            <div class="card mb-3">
+                <div class="card-header">
+                	<button type="button" class="btn btn-primary" [disabled]="allPermissions && !isANodeSelected()" (click)="openModal(book)"><i class="fa fa-calendar"></i> Book</button>
+	                <div class="float-right">
+		                <button type="button" class="btn btn-success" (click)="openModal(add)"><i class="fa fa-plus" (click)="openModal(add)"></i> Add</button>
+		                <button type="button" class="btn btn-warning" [disabled]="allPermissions && !isANodeSelected()" (click)="openModal(edit); setModelNode()"><i class="fa fa-edit"></i> Edit</button>
+		                <button type="button" class="btn btn-danger" [disabled]="allPermissions && !isANodeSelected()" (click)="openModal(delete)"><i class="fa fa-minus"></i> Delete</button>
+	                </div>
+                </div>
+                <table class="table table-hover table-bordered">
+                    <thead class="thead-inverse">
+	                    <tr>
+	                        <th class="fit"></th>
+	                        <th>Node</th>
+	                        <th>Responsible</th>
+	                        <th>Status</th>
+	                        <th>Booked by</th>
+	                        <th>Booked until</th>
+	                        <th>Comments</th>
+	                    </tr>
+                    </thead>
+                    <tbody>
+	                    <tr *ngFor="let node of nodes" (click)="setClickedRow(node)" [ngClass]="{'highlight': node.isSelected}">
+	                    	<td><input type="checkbox" value="" [checked]="node.isSelected" [disabled]="node.status !== 'FREE'"></td>
+	                        <td>{{node.name}}</td>
+	                        <td>{{node.responsible}}</td>
+	                        <td>{{node.status}}</td>
+	                        <td>{{node.bookedBy}}</td>
+	                        <td>{{node.bookedUntil}}</td>
+	                        <td>{{node.comments}}</td>
+	                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<ng-template #add let-c="close" let-d="dismiss">
+    <div class="modal-header">
+        <h4 class="modal-title">Add a new node</h4>
+        <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <form role="form" name="form" (ngSubmit)="f.form.valid && addNode()" #f="ngForm" novalidate>
+	    <div class="modal-body">
+	        	<fieldset class="form-group" [ngClass]="{ 'has-error': f.submitted && !name.valid }">
+		            <label>Node name</label>
+		            <input type="text" class="form-control" placeholder="Enter the node name here" name="name" [(ngModel)]="modelNode.name" #name="ngModel" required>
+		            <p class="help-block" style="color: red" *ngIf="f.submitted && !name.valid">Name is required.</p>
+				</fieldset>
+				<fieldset class="form-group">
+		            <label>Responsible</label>
+		            <input type="text" class="form-control" placeholder="Enter the responsible person here" name="responsible" [(ngModel)]="modelNode.responsible" #responsible="ngModel" required>
+		            <p class="help-block" style="color: red" *ngIf="f.submitted && !responsible.valid">Responsible is required.</p>
+				</fieldset>
+				<fieldset class="form-group">
+		            <label>Comments</label>
+		            <textarea class="form-control" rows="2" placeholder="Enter the comments here" name="comments" [(ngModel)]="modelNode.comments" #comments="ngModel"></textarea>
+				</fieldset>
+	    </div>
+	    <div class="modal-footer">
+	    	<button type="submit" class="btn btn-success"><i class="fa fa-plus"></i> Add</button>
+	    	<button type="reset" class="btn btn-warning"><i class="fa fa-history"></i> Reset</button>
+	        <button type="button" class="btn btn-info" (click)="c('Cancel click')"><i class="fa fa-ban"></i> Cancel</button>
+	    </div>
+    </form>
+</ng-template>
+
+<ng-template #edit let-c="close" let-d="dismiss">
+    <div class="modal-header">
+        <h4 class="modal-title">Edit node</h4>
+        <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <form role="form" name="form" (ngSubmit)="f.form.valid && editNode()" #f="ngForm" novalidate>
+	    <div class="modal-body">
+	        	<fieldset class="form-group" [ngClass]="{ 'has-error': f.submitted && !name.valid }">
+		            <label>Node name</label>
+		            <input type="text" class="form-control" placeholder="Enter the node name here" name="name" [(ngModel)]="modelNode.name" #name="ngModel" required>
+		            <p class="help-block" style="color: red" *ngIf="f.submitted && !name.valid">Name is required.</p>
+				</fieldset>
+				<fieldset class="form-group">
+		            <label>Responsible</label>
+		            <input type="text" class="form-control" placeholder="Enter the responsible person here" name="responsible" [(ngModel)]="modelNode.responsible" #responsible="ngModel" required>
+		            <p class="help-block" style="color: red" *ngIf="f.submitted && !responsible.valid">Responsible is required.</p>
+				</fieldset>
+				<fieldset class="form-group">
+		            <label>Comments</label>
+		            <textarea class="form-control" rows="2" placeholder="Enter the comments here" name="comments" [(ngModel)]="modelNode.comments" #comments="ngModel"></textarea>
+				</fieldset>
+	    </div>
+	    <div class="modal-footer">
+	    	<button type="submit" class="btn btn-primary"><i class="fa fa-check"></i> Save</button>
+	        <button type="button" class="btn btn-info" (click)="c('Cancel click')"><i class="fa fa-ban"></i> Cancel</button>
+	    </div>
+    </form>
+</ng-template>
+
+<ng-template #delete let-c="close" let-d="dismiss">
+    <div class="modal-header">
+        <h4 class="modal-title">Are you sure you want to delete this node?</h4>
+        <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+    	<label>Node: {{selectedNode.name}}</label>
+    </div>
+    <div class="modal-footer">
+    	<button type="button" class="btn btn-danger" (click)="deleteSelectedNode()"><i class="fa fa-minus"></i> Delete</button>
+        <button type="button" class="btn btn-info" (click)="c('Cancel click')"><i class="fa fa-ban"></i> Cancel</button>
+    </div>
+</ng-template>
+
+<ng-template #book let-c="close" let-d="dismiss">
+    <div class="modal-header">
+        <h4 class="modal-title">Book node: {{selectedNode.name}}</h4>
+        <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <form role="form" name="form" (ngSubmit)="!(modelUntilDate === null || modelUntilDate === undefined) && f.form.valid && bookNode()" #f="ngForm" novalidate>
+	    <div class="modal-body">
+	    	<fieldset class="form-group">
+	            <label>E-mail</label>
+	            <input type="text" class="form-control" placeholder="Enter the booker here" name="bookedBy" [(ngModel)]="modelNode.bookedBy" #bookedBy="ngModel" required>
+	            <p class="help-block" style="color: red" *ngIf="f.submitted && !bookedBy.valid">Booker is required.</p>
+			</fieldset>
+			<fieldset class="form-group">
+        		<label>Book until</label>
+	             <div class="input-group">
+	                 <input class="form-control" placeholder="yyyy-mm-dd" name="dpu" [(ngModel)]="modelUntilDate" ngbDatepicker #du="ngbDatepicker" [minDate]="minDate" readonly required>
+	                 <div class="input-group-addon" (click)="du.toggle()">
+	                     <span class="fa fa-calendar"></span>
+	                 </div> 
+	             </div>
+	             <p class="help-block" style="color: black" *ngIf="modelUntilDate !== null && modelUntilDate !== undefined">Will be booked until: {{modelUntilDate.year}}-{{modelUntilDate.month}}-{{modelUntilDate.day}} 23:57.</p>
+	             <p class="help-block" style="color: red" *ngIf="f.submitted && (modelUntilDate === null || modelUntilDate === undefined)">Date is required.</p>
+			</fieldset>
+	    </div>
+	    <div class="modal-footer">
+	    	<button type="submit" class="btn btn-primary"><i class="fa fa-calendar-plus-o"></i> Book</button>
+	        <button type="button" class="btn btn-info" (click)="c('Cancel click')"><i class="fa fa-ban"></i> Cancel</button>
+	    </div>
+    </form>
+</ng-template>
